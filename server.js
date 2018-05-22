@@ -17,7 +17,7 @@ const wss = new WebSocket.Server({ port: 8080 });
 
 
 wss.on('connection', function connection(ws) {
-  ws.send('hello mate');
+  ws.send('G91');
 });
 wss.broadcast = function broadcast(data) {
   wss.clients.forEach(function each(client) {
@@ -32,20 +32,20 @@ wss.broadcast = function broadcast(data) {
 app.get("/up", function(req, res) {
     res.send("ok");
     console.log("received")
-    wss.broadcast("up")
+    wss.broadcast("G0 X10Y0")
 });
 app.get("/down", function(req, res) {
     res.send("ok");
     console.log("received")
-    wss.broadcast("down")
+    wss.broadcast("G0 X-10Y0")
 });
 app.get("/right", function(req, res) {
     res.send("ok");
     console.log("received")
-    wss.broadcast("right")
+    wss.broadcast("G0 X0Y10")
 });
 app.get("/left", function(req, res) {
     res.send("ok");
     console.log("received")
-    wss.broadcast("left")
+    wss.broadcast("G0 X0Y10")
 });
