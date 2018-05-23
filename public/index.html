@@ -85,19 +85,24 @@
      };
 
      connection.onmessage = function (message) {
+       const history = document.getElementById('history');
        // try to decode json (I assume that each message
        // from server is json)
        try {
-	 const json = JSON.parse(message.data);
-	 const history = document.getElementById('history');
-	 history.innerHTML += json.username + ' -- ' + json.direction + ' <br/>';
-	 history.scrollTop = history.scrollHeight;
+	 var json = JSON.parse(message.data);
        } catch (e) {
-	 console.log('This doesn\'t look like a valid JSON: ',
-		     message.data);
+	 console.log('This doesn\'t look like a valid JSON: ', message.data);
 	 return;
        }
-       // handle incoming message
+
+       if (json.username) {
+	 history.innerHTML += json.username + ' -- ' + json.direction + ' <br/>';
+       } else if (json.choosen) {
+	 history.innerHTML += '<b> Choosen direction : </b> ' + json.choosen.toUpperCase() + ' <br/>';
+       }
+
+       history.scrollTop = history.scrollHeight;
+
      };
     </script>
 

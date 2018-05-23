@@ -72,30 +72,6 @@ app.get('/direction/:direction', (req, res) => {
     return res.json({numvoter:vote,lastChoice:lastvote});
 });
 
-// app.get("/up", function(req, res) {
-//     res.json({numvoter:vote,lastChoice:lastvote});
-//     upcount+=1;
-//     console.log("received")
-// });
-// app.get("/down", function(req, res) {
-//     res.json({numvoter:vote,lastChoice:lastvote});
-//     downcount+=1;
-//     console.log("received")
-// });
-// app.get("/right", function(req, res) {
-//     res.json({numvoter:vote,lastChoice:lastvote});
-//     leftcount+=1;
-//     console.log("received")
-// });
-// app.get("/left", function(req, res) {
-//     res.json({numvoter:vote,lastChoice:lastvote});
-//     rightcount+=1;
-//     console.log("received")
-// });
-
-const broadcastDirectionToClients = direction => {
-
-};
 
 function getPool() {
     const sum = upcount + downcount + leftcount + rightcount;
@@ -104,24 +80,17 @@ function getPool() {
         vote = 0;
         lastvote = "null";
     } else {
-        var a = [upcount, downcount, leftcount, rightcount];
-        var i = a.reduce((iMax, x, i, arr) => x > arr[iMax] ? i : iMax, 0);
+	var votes = ["up", "down", "left", "right"];
+	var commands = ["G0 Z10Y0\n", "G0 Z-10Y0\n", "G0 Z0Y10\n", "G0 Z0Y-10\n"];
+        var votesSum = [upcount, downcount, leftcount, rightcount];
+	var i = votesSum.indexOf(Math.max(...votesSum));
 
         vote = sum;
-        if(i == 0){
-            lastvote="up";
-            wss.broadcast("G0 Z10Y0\n");
-        } else if(i == 1){
-            lastvote="down";
-            wss.broadcast("G0 Z-10Y0\n");
-        } else if(i == 2){
-            lastvote="right";
-            wss.broadcast("G0 Z0Y10\n");
-        } else if(i == 3){
-            lastvote="left";
-            wss.broadcast("G0 Z0Y-10\n");
-        }
+	lastvote = votes[i];
+	wss.broadcast(commands[i]);
     }
+
+    chatWSS.broadcast(JSON.stringify({choosen: lastvote}));
 
     upcount	= 0;
     downcount	= 0;
