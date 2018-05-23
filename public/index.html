@@ -1,52 +1,64 @@
 <html>
   <head>
     <title>Sample "Hello, World" Application</title>
+    <style>
+     #history {
+       max-height: 400px;
+       overflow-y: scroll;
+     }
+    </style>
   </head>
   <body bgcolor=white>
     <button id="up" onclick="move('up')">Up</button>
     <button id="down" onclick="move('down')">Down</button>
     <button id="right" onclick="move('right')">Right</button>
     <button id="left" onclick="move('left')">Left</button>
+    <input type="text" placeholder="username" id="username" />
     <p> num of voters </p>
     <span id="numvoter"></span>
     <p> Last choice made</p>
     <span id="lastChoice"></span>
     <iframe allowfullscreen="true" src="https://mixer.com/embed/player/37083436"></iframe>
-    <script>
 
-     var url = "http://ec2-35-180-32-199.eu-west-3.compute.amazonaws.com:3000/";
+
+    <div id="history">
+    </div>
+
+
+    <script>
+     var host = "10.26.150.130";
+     var apiPort = 3000;
+     var apiURL = 'http://' + host + ':' + apiPort;
+     var wsPort = 8888;
+     var wsURL = 'ws://' + host + ':' + wsPort;
+     /* var url = "http://ec2-35-180-32-199.eu-west-3.compute.amazonaws.com:3000/"; */
      function move(dir){
-       httpGetAsync(url+dir,function(response){
-         resp=JSON.parse(response)
+       var username = document.getElementById('username').value || null;
+       var url = apiURL + '/direction/' + dir + (username ? "?username=" + username : "");
+       httpGetAsync(url, function(response){
+         resp = JSON.parse(response)
          console.log(resp)
-         document.getElementById("numvoter").innerHTML =resp.numvoter;
-         document.getElementById("lastChoice").innerHTML =resp.lastChoice;
+         document.getElementById("numvoter").innerHTML = resp.numvoter;
+         document.getElementById("lastChoice").innerHTML = resp.lastChoice;
 
        })
      }
      document.onkeydown = checkKey;
 
      function checkKey(e) {
-
        e = e || window.event;
+       const assoc = {37: 'left', 38: 'up', 39: 'right', 40: 'down' };
 
-       if (e.keyCode == '38') {
-         move('up')
-       }
-       else if (e.keyCode == '40') {
-         move('down')
-       }
-       else if (e.keyCode == '37') {
-         move('left')
-       }
-       else if (e.keyCode == '39') {
-         move('rigth')
-       }
-
+       Object.keys(assoc).forEach(key => {
+	 if (key == e.keyCode) {
+	   move(assoc[key]);
+	   e.preventDefault();
+	   e.stopPropagation();
+	 }
+       })
      }
 
-     function httpGetAsync(theUrl, callback)
-     {
+     function httpGetAsync(theUrl, callback) {
        var xmlHttp = new XMLHttpRequest();
        xmlHttp.onreadystatechange = function() {
          if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
@@ -56,6 +68,36 @@
        xmlHttp.send(null);
      }
 
+     /* ---------------------------------------------------------------------------------------------------- */
+
+     // if user is running mozilla then use it's built-in WebSocket
+     window.WebSocket = window.WebSocket || window.MozWebSocket;
+
+     var connection = new WebSocket(wsURL);
+
+     connection.onopen = function () {
+       console.log("connection OPEN")
+     };
+
+     connection.onerror = function (error) {
+       console.error({error});
+     };
+
+     connection.onmessage = function (message) {
+       // try to decode json (I assume that each message
+       // from server is json)
+       try {
+	 const json = JSON.parse(message.data);
+	 const history = document.getElementById('history');
+	 history.innerHTML += json.username + ' -- ' + json.direction + ' <br/>';
+	 history.scrollTop = history.scrollHeight;
+       } catch (e) {
+	 console.log('This doesn\'t look like a valid JSON: ',
+		     message.data);
+	 return;
+       }
+       // handle incoming message
+     };
     </script>
 
   </body>
