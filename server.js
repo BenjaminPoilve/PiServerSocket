@@ -2,7 +2,7 @@ const WebSocket = require('ws');
 var RateLimit = require('express-rate-limit');
 
 var limiter = new RateLimit({
-  windowMs: 1*1000, // 1 second
+  windowMs: 0.5*1000, // 1 second
   max: 1, // limit each IP to 100 requests per windowMs
   delayMs: 0 // disable delaying - full speed until the max limit is reached
 });
@@ -101,5 +101,5 @@ leftcount=0;
  rightcount=0;
 }
 
-setInterval(getPool,1000);
+setInterval(getPool,500);
 

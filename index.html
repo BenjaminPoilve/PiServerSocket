@@ -1,0 +1,62 @@
+<html>
+  <head>
+    <title>Sample "Hello, World" Application</title>
+  </head>
+  <body bgcolor=white>
+      <button id="up" onclick="move('up')">Up</button>
+      <button id="down" onclick="move('down')">Down</button>
+      <button id="right" onclick="move('right')">Right</button>
+      <button id="left" onclick="move('left')">Left</button>
+      <p> num of voters </p>
+      <span id="numvoter"></span>
+      <p> Last choice made</p>
+      <span id="lastChoice"></span>
+
+      <script>
+
+      var url = "http://ec2-35-180-32-199.eu-west-3.compute.amazonaws.com:3000/";
+      function move(dir){
+          httpGetAsync(url+dir,function(response){
+              resp=JSON.parse(response)
+              console.log(resp)
+              document.getElementById("numvoter").innerHTML =resp.numvoter;
+              document.getElementById("lastChoice").innerHTML =resp.lastChoice;
+
+          })
+      }
+      document.onkeydown = checkKey;
+
+      function checkKey(e) {
+
+          e = e || window.event;
+
+          if (e.keyCode == '38') {
+             move('up')
+          }
+          else if (e.keyCode == '40') {
+             move('down')
+          }
+          else if (e.keyCode == '37') {
+             move('left')
+          }
+          else if (e.keyCode == '39') {
+              move('rigth')
+          }
+
+}
+
+      function httpGetAsync(theUrl, callback)
+      {
+          var xmlHttp = new XMLHttpRequest();
+          xmlHttp.onreadystatechange = function() { 
+              if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+                  callback(xmlHttp.responseText);
+          }
+          xmlHttp.open("GET", theUrl, true); // true for asynchronous 
+          xmlHttp.send(null);
+      }
+
+      </script>
+
+  </body>
+</html>
