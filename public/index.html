@@ -97,7 +97,7 @@
 
        if (json.username) {
 	 history.innerHTML += json.username + ' -- ' + json.direction + ' <br/>';
-       } else if (json.choosen) {
+       } else if (json.choosen && json.choosen !== "null") {
 	 history.innerHTML += '<b> Choosen direction : </b> ' + json.choosen.toUpperCase() + ' <br/>';
        }
 
