@@ -11,8 +11,8 @@ const options = {
 init=false;
 
 var SerialPort = require('serialport');
-var port = new SerialPort('/dev/cu.usbserial-A5055PCP', {
-    baudRate: 250000
+var port = new SerialPort('/dev/ttyUSB0', {
+  baudRate: 250000
 }, function (err) {
     if (err) {
 	return console.log('Error: ', err.message);
