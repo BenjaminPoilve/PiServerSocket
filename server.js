@@ -2,23 +2,24 @@ const WebSocket = require('ws');
 var RateLimit = require('express-rate-limit');
 
 var limiter = new RateLimit({
-  windowMs: 0.5*1000, // 1 second
-  max: 1, // limit each IP to 100 requests per windowMs
-  delayMs: 0 // disable delaying - full speed until the max limit is reached
+    windowMs: 0.5*1000, // 1 second
+    max: 1, // limit each IP to 100 requests per windowMs
+    delayMs: 0 // disable delaying - full speed until the max limit is reached
 });
- 
+
 //  apply to all requests
 var express = require("express");
 var bodyParser = require("body-parser");
 var app = express();
 
+app.use(express.static('public/'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(limiter);
 app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
 });
 
 
@@ -31,14 +32,14 @@ const wss = new WebSocket.Server({ port: 8080 });
 
 
 wss.on('connection', function connection(ws) {
-  ws.send('G91 G28 \n');
+    ws.send('G91 G28 \n');
 });
 wss.broadcast = function broadcast(data) {
-  wss.clients.forEach(function each(client) {
-    if (client.readyState === WebSocket.OPEN) {
-      client.send(data);
-    }
-  });
+    wss.clients.forEach(function each(client) {
+	if (client.readyState === WebSocket.OPEN) {
+	    client.send(data);
+	}
+    });
 };
 
 var upcount=0;
@@ -47,6 +48,9 @@ var leftcount=0;
 var rightcount=0;
 var vote=0;
 var lastvote="null";
+
+app.get('/', (req, res) => res.sendFile('index.html'));
+
 
 app.get("/up", function(req, res) {
     res.json({numvoter:vote,lastChoice:lastvote});
@@ -95,11 +99,10 @@ function getPool() {
             wss.broadcast("G0 Z0Y-10\n")
         }
     }
- upcount=0;
- downcount=0;
-leftcount=0;
- rightcount=0;
+    upcount=0;
+    downcount=0;
+    leftcount=0;
+    rightcount=0;
 }
 
 setInterval(getPool,500);
-
