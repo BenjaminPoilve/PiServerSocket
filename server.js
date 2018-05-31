@@ -1,5 +1,5 @@
-const WebSocket	= require('ws');
-const RateLimit	= require('express-rate-limit');
+const WebSocket		= require('ws');
+const RateLimit		= require('express-rate-limit');
 const express		= require("express");
 const bodyParser	= require("body-parser");
 
@@ -35,6 +35,7 @@ const wss  = new WebSocket.Server({ port: 8080 });
 wss.on('connection', ws => {
     ws.send('G91 G28 \n');
 });
+
 wss.broadcast = (data) => {
     wss.clients.forEach(client => {
 	if (client.readyState === WebSocket.OPEN) {
@@ -47,6 +48,10 @@ var upcount	= 0;
 var downcount	= 0;
 var leftcount	= 0;
 var rightcount	= 0;
+var d1count	= 0;
+var d2count	= 0;
+var d3count	= 0;
+var d4count	= 0;
 var vote	= 0;
 var lastvote	= "null";
 
@@ -59,6 +64,10 @@ app.get('/direction/:direction', (req, res) => {
 	{dir: "down",	fn() { downcount++;	}},
 	{dir: "right",	fn() { rightcount++;	}},
 	{dir: "left",	fn() { leftcount++;	}},
+	{dir: "d1",	fn() { d1count++;	}},
+	{dir: "d2",	fn() { d2count++;	}},
+	{dir: "d3",	fn() { d3count++;	}},
+	{dir: "d4",	fn() { d4count++;	}},
     ];
     const direction = choices
 	  .map(c => c.dir)
@@ -80,9 +89,9 @@ function getPool() {
         vote = 0;
         lastvote = "null";
     } else {
-	var votes = ["up", "down", "left", "right"];
-	var commands = ["G0 Z10Y0\n", "G0 Z-10Y0\n", "G0 Z0Y10\n", "G0 Z0Y-10\n"];
-        var votesSum = [upcount, downcount, leftcount, rightcount];
+	var votes = ["up", "down", "left", "right", "d1", "d2", "d3", "d4"];
+	var commands = ["G0 Z10Y0\n", "G0 Z-10Y0\n", "G0 Z0Y10\n", "G0 Z0Y-10\n", "G0 Z10Y10\n", "G0 Z10Y-10\n", "G0 Z-10Y-10\n", "G0 Z-10Y10\n"];
+        var votesSum = [upcount, downcount, leftcount, rightcount, d1count, d2count, d3count, d4count];
 	var i = votesSum.indexOf(Math.max(...votesSum));
 
         vote = sum;
@@ -96,6 +105,10 @@ function getPool() {
     downcount	= 0;
     leftcount	= 0;
     rightcount	= 0;
+    d1count	= 0;
+    d2count	= 0;
+    d3count	= 0;
+    d4count	= 0;
 }
 
 setInterval(getPool,500);
