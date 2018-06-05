@@ -90,7 +90,7 @@ function getPool() {
         lastvote = "null";
     } else {
 	var votes = ["up", "down", "left", "right", "d1", "d2", "d3", "d4"];
-	var commands = ["G0 Z10Y0\n", "G0 Z-10Y0\n", "G0 Z0Y10\n", "G0 Z0Y-10\n", "G0 Z10Y10\n", "G0 Z10Y-10\n", "G0 Z-10Y-10\n", "G0 Z-10Y10\n"];
+	var commands = ["G0 Z10Y0\n", "G0 Z-10Y0\n", "G0 Z0Y-10\n", "G0 Z0Y10\n", "G0 Z10Y-10\n", "G0 Z10Y10\n", "G0 Z-10Y10\n", "G0 Z-10Y-10\n"];
         var votesSum = [upcount, downcount, leftcount, rightcount, d1count, d2count, d3count, d4count];
 	var i = votesSum.indexOf(Math.max(...votesSum));
 
