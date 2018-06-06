@@ -83,7 +83,7 @@ app.get('/direction/:direction', (req, res) => {
 
 
 function getPool() {
-    const sum = upcount + downcount + leftcount + rightcount;
+    const sum = upcount + downcount + leftcount + rightcount + d1count + d2count + d3count + d4count;
 
     if(0 == sum) {
         vote = 0;
